@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Promise</title>
+  </head>
+  <body>
+    <form class="my-form">
+      <input
+        type="text"
+        class="currency-input"
+        placeholder="Type amount of money here"
+      />
+      <br />
+      <select class="currency-select" onchange="optionFirst.call(this)">
+        <option selected>Select Your Currency:</option>
+      </select>
+      <br />
+      <select class="second-currency-select" onchange="optionSecond.call(this)">
+        <option selected>Select Currency to Change:</option>
+      </select>
+      <br />
+      <button class="btn-calc">Calculate</button>
+    </form>
+    <div class="currency-result"></div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script>
+      const receivedArr = [];
+      const currArr = [];
+
+      fetch("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json")
+        .then(res => res.json())
+        .then(data => {
+          const firstSelect = document.querySelector(".currency-select");
+          const secondSelect = document.querySelector(
+            ".second-currency-select"
+          );
+          data.forEach(item => {
+            receivedArr.push(item);
+            const newOption = new Option(item.txt, item.cc);
+            firstSelect.append(newOption);
+          });
+          data.forEach(item => {
+            const newOption = new Option(item.txt, item.cc);
+            secondSelect.append(newOption);
+          });
+        })
+        .catch(err => alert("Something Went Wrong!"));
+
+      function optionFirst() {
+        const selectedOpt = this.options[this.selectedIndex].value;
+        receivedArr.forEach(item => {
+          if (item.cc === selectedOpt) {
+            let objCurr = {
+              firstCurrency: item.rate
+            };
+            currArr.splice(0, 1, objCurr);
+          }
+        });
+      }
+
+      function optionSecond() {
+        const selectedOpt = this.options[this.selectedIndex].value;
+        receivedArr.forEach(item => {
+          if (item.cc === selectedOpt) {
+            let objCurr = {
+              secondCurrency: item.rate
+            };
+            currArr.splice(1, 1, objCurr);
+          }
+        });
+      }
+
+      $(".btn-calc").on("click", e => {
+        e.preventDefault();
+        const myInput = document.querySelector(".currency-input");
+        const result =
+          (currArr[0].firstCurrency / currArr[1].secondCurrency) *
+          myInput.value;
+        $(".currency-result").text(result.toFixed(1));
+      });
+    </script>
+  </body>
+</html>
