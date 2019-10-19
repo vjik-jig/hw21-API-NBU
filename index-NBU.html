@@ -14,11 +14,11 @@
         placeholder="Type amount of money here"
       />
       <br />
-      <select class="currency-select" onchange="optionFirst.call(this)">
+      <select class="currency-select">
         <option selected>Select Your Currency:</option>
       </select>
       <br />
-      <select class="second-currency-select" onchange="optionSecond.call(this)">
+      <select class="second-currency-select">
         <option selected>Select Currency to Change:</option>
       </select>
       <br />
@@ -30,7 +30,9 @@
       const receivedArr = [];
       const currArr = [];
 
-      fetch("https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json")
+      fetch(
+        "https://old.bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json"
+      )
         .then(res => res.json())
         .then(data => {
           const firstSelect = document.querySelector(".currency-select");
@@ -49,8 +51,8 @@
         })
         .catch(err => alert("Something Went Wrong!"));
 
-      function optionFirst() {
-        const selectedOpt = this.options[this.selectedIndex].value;
+      $(".currency-select").on("change", e => {
+        const selectedOpt = e.target.value;
         receivedArr.forEach(item => {
           if (item.cc === selectedOpt) {
             let objCurr = {
@@ -59,10 +61,10 @@
             currArr.splice(0, 1, objCurr);
           }
         });
-      }
+      });
 
-      function optionSecond() {
-        const selectedOpt = this.options[this.selectedIndex].value;
+      $(".second-currency-select").on("change", e => {
+        const selectedOpt = e.target.value;
         receivedArr.forEach(item => {
           if (item.cc === selectedOpt) {
             let objCurr = {
@@ -71,7 +73,7 @@
             currArr.splice(1, 1, objCurr);
           }
         });
-      }
+      });
 
       $(".btn-calc").on("click", e => {
         e.preventDefault();
